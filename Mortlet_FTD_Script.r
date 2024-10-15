@@ -1,36 +1,49 @@
-# Morlet Wavelet Coherence Graphing Tool On Financial Failed-To-Deliver and closing stock price. 
-# By: James Grandoff 
-# Notes
-# Change read_xlsx("") with whatever dataset you want compared 
-# Line 1 of your data file should contain the labels for the dataset for cohesion testing
-# Please follow along smaller dataset format when dealing with big data sets(1G+)
-# par() function is used for wavelet coherence and phase difference and finally make room for the color bar on the right side.
-# The cbind(1:x, column_name) will vary depending on how many columns you have loaded. We are now clustering the data, which can be done an exponential amount of times. 
-# nrands is the amount of simulations you want the dataset to endure. nrands should be large (>= 1000) for respectable results.
-# abline is the function for plotting the graph with lines, the v = seq(x, n, x) will represent the time of the data(i.e., Length) 4 = 1 Month 52 = 1 Year 
-# On the X-Axis should define the time period that should plot. 
-#
-# [*Future fix]: Why doesn't the X-Axis plot the timeline (Janury 2024, Febuary 2024)
+# Load required libraries
+library(biwavelet)  # for wavelet coherence analysis
+library(readxl)     # for reading Excel files
 
-library(biwavelet)
-library(readxl)
-
+# Display help documentation for biwavelet package
 help("biwavelet")
 
-Data <- read_xlsx("U:\\Mortlet\\GME_OUT_3_Bigger.xlsx") #Change to your file path
+# Read in data from Excel file (update file path as needed)
+Data <- read_xlsx("U:\\Mortlet\\GME_OUT_3_Bigger.xlsx")
+
+# Attach the data to the R environment
 attach(Data)
 
-t1 = cbind(1:61, Close) 
-t2 = cbind(1:61, GmeVolume)
+# Create time series data frames for Close and GmeVolume
+t1 = cbind(1:61, Close)  # time series with Close values
+t2 = cbind(1:61, GmeVolume)  # time series with GmeVolume values
 
-nrands = 1000 
+# Set number of random permutations for wavelet coherence analysis
+nrands = 1000
 
+# Perform wavelet coherence analysis on t1 and t2
 wtc.AB = wtc(t1, t2, nrands = nrands)
-par(oma = c(0, 0, 0, 1), mar = c(5,4,5,5) + 0.3)
-plot(wtc.AB, plot.phase = TRUE, lty.coi = 1, col.coi = "gray", lwd.coi = 2, lwd.sig = 2, arrow.lwd = 0.03, arrow.len = 0.12, ylab = "Period", xlab = "Time", plot.cb = TRUE, main = "GameStop Close vs FNDA FTD Volume 2024 ", xaxt = "n")
-n = length(t1[,1])
-#Square Plotting Of Time 
-abline(v = seq(12, n,12), h = 1:16, col = "black", lty = 1, lwd = 1)
-#define X-Axis
-axis(side = 3, at = c(seq(0, n, 260)), labels = c(seq(2024, 2024, 2)))
 
+# Set plot parameters
+par(oma = c(0, 0, 0, 1), mar = c(5,4,5,5) + 0.3)
+
+# Plot wavelet coherence results
+plot(wtc.AB, 
+     plot.phase = TRUE,  # plot phase arrows
+     lty.coi = 1,  # line type for coherence contours
+     col.coi = "gray",  # color for coherence contours
+     lwd.coi = 2,  # line width for coherence contours
+     lwd.sig = 2,  # line width for significance contours
+     arrow.lwd = 0.03,  # line width for phase arrows
+     arrow.len = 0.12,  # length of phase arrows
+     ylab = "Period",  # y-axis label
+     xlab = "Time",  # x-axis label
+     plot.cb = TRUE,  # plot color bar
+     main = "GameStop Close vs FNDA FTD Volume 2024",  # plot title
+     xaxt = "n")  # suppress default x-axis
+
+# Get length of time series
+n = length(t1[,1])
+
+# Add grid lines to plot
+abline(v = seq(12, n,12), h = 1:16, col = "black", lty = 1, lwd = 1)
+
+# Define custom x-axis labels
+axis(side = 3, at = c(seq(0, n, 260)), labels = c(seq(2024, 2024, 2)))
